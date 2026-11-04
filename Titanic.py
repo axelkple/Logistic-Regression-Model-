@@ -61,56 +61,37 @@ features = ['Survived', 'Sex_numeric', 'Pclass', 'Fare', 'SibSp', 'Parch']
 subset_df = axel[features]
 
 # Generate scatter matrix
-plt.figure(figsize=(10, 10))
+plt.figure(figsize=(10, 10))  
 scatter_matrix(subset_df, alpha=0.3, figsize=(10, 10), diagonal='hist', marker='o')
 plt.suptitle("Titanic Feature Relationships Scatter Matrix - Axel", fontsize=14, y=0.92)
-plt.tight_layout()
 plt.show()
 
+axel = axel.drop(columns=['Sex_numeric'])
 
-
-# 1. Drop the four unhelpful columns identified earlier
+# Supprimer les 4 colonnes inutiles
 axel = axel.drop(columns=['PassengerId', 'Name', 'Ticket', 'Cabin'])
 
-# 2 & 3. Using get_dummies to transform categorical variables ('Sex') into numeric columns (yielding 2 columns)
-sex_dummies = pd.get_dummies(axel['Sex'])
-axel = pd.concat([axel, sex_dummies], axis=1)
+# Transformer Sex et Embarked en colonnes numériques (préfixes Sex_ et Embarked_)
+axel = pd.get_dummies(axel, columns=['Sex', 'Embarked'])
 
-# 4. Remove the original categorical variables columns ('Sex' and 'Embarked') using pandas drop method
-axel = axel.drop(columns=['Sex', 'Embarked'])
-
-# 5. Replace missing values in 'Age' with the mean of the age column
+# Remplacer les valeurs manquantes de Age par la moyenne
 axel['Age'] = axel['Age'].fillna(axel['Age'].mean())
 
-# 6. Change all column types into float
+# Tout convertir en float
 axel = axel.astype(float)
-
-# 7. Display axel.info() to verify the structure
 axel.info()
 
-
-
-
-# 1. Write the normalization function using pandas .min() and .max()
+# Normalisation
 def normalize_df(dataframe):
     return (dataframe - dataframe.min()) / (dataframe.max() - dataframe.min())
 
-# 2. Call the function passing your transformed dataframe
 df_normalized = normalize_df(axel)
-
-# 3. Display the first two records
 print(df_normalized.head(2))
 
-
-
-# 1. Generate a histogram plot for all variables with a figure size of 9x10 inches
-fig, ax = plt.subplots(figsize=(9, 10))
-df_normalized.hist(ax=ax, bins=20)
-
-plt.suptitle("Titanic Normalized Variables Histograms - Axel", fontsize=14, y=0.92)
+# Histogrammes (10 bins par défaut, pas de titre global)
+df_normalized.hist(figsize=(9, 10))
 plt.tight_layout()
 plt.show()
-
 
 # Split features into x_firstname (dropping the target column 'Survived')
 x_axel = df_normalized.drop(columns=['Survived'])
